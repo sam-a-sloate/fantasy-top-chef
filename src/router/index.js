@@ -55,6 +55,17 @@ const routes = [
   },
   {
     //Page Containing scoring and rules
+    path: "/team/:uid",
+    name: "Team",
+
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Team.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    //Page Containing scoring and rules
     path: "/rule",
     name: "Rules",
     component: () =>

@@ -22,6 +22,7 @@ const auth = firebase.auth();
 // collection references
 const usersCollection = db.collection("users");
 const leagueCollection = db.collection("leagueCollection");
+const teamCollection = db.collection("teamCollection");
 
 // export utils/refs
-export { db, auth, usersCollection, leagueCollection };
+export { db, auth, usersCollection, leagueCollection, teamCollection };

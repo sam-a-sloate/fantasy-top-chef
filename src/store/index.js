@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as fb from "../firebase";
 import router from "../router/index";
+import firebase from "firebase/app";
 
 Vue.use(Vuex);
 
@@ -10,6 +11,7 @@ const store = new Vuex.Store({
     // Fully describes signed in user's profile
     userProfile: {},
     currentLeague: {},
+    currentTeam: {},
     leagues: [],
   },
   mutations: {
@@ -19,6 +21,9 @@ const store = new Vuex.Store({
     },
     setCurrentLeague(state, val) {
       state.currentLeague = val;
+    },
+    setCurrentTeam(state, val) {
+      state.currentTeam = val;
     },
   },
   getters: {
@@ -84,11 +89,43 @@ const store = new Vuex.Store({
       router.push("/league/" + newLeague.id);
     },
 
+    async createTeam({ state }, teamForm) {
+      const teamInLeague = {
+        name: teamForm.name,
+        ownerName: state.userProfile.name,
+        owner: fb.auth.currentUser.uid,
+      };
+      const newTeam = await fb.teamCollection.add({
+        name: teamForm.name,
+        owner: fb.auth.currentUser.uid,
+        ownerName: state.userProfile.name,
+        league: state.currentLeague.id,
+      });
+      await fb.leagueCollection.doc(state.currentLeague.id).update({
+        teams: firebase.firestore.FieldValue.arrayUnion({
+          id: newTeam.id,
+          ...teamInLeague,
+        }),
+      });
+      router.push("/team/" + newTeam.id);
+    },
+
     async setCurrentLeague({ commit }, { uid }) {
       return fb.leagueCollection
         .doc(uid)
         .get()
-        .then((cl) => commit("setCurrentLeague", cl.data()));
+        .then((cl) => commit("setCurrentLeague", { id: uid, ...cl.data() }));
+    },
+
+    async setCurrentTeam({ commit, dispatch }, { uid }) {
+      return fb.teamCollection
+        .doc(uid)
+        .get()
+        .then((cl) => {
+          const data = cl.data();
+          commit("setCurrentTeam", { id: uid, ...data });
+          dispatch("setCurrentLeague", { uid: data.league });
+        });
     },
   },
   modules: {},

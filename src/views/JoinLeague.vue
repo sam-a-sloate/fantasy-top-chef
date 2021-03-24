@@ -41,7 +41,6 @@ export default {
   computed: {
      ...mapState(["currentLeague"]),
     isFull() {
-      console.log(this.currentLeague.teams.length >= this.currentLeague.max);
       return this.currentLeague.teams.length >= this.currentLeague.max;
     }
   },
