@@ -22,12 +22,12 @@ export default {
       teamForm: {
         name: "",
       },
-      loaded: false
+      loaded: false,
     };
   },
   methods: {
     async getLeague(uid) {
-    //Need to figure out how to wait for this before moving on
+      //Need to figure out how to wait for this before moving on
       await this.$store.dispatch("setCurrentLeague", {
         uid,
       });
@@ -39,13 +39,15 @@ export default {
     },
   },
   computed: {
-     ...mapState(["currentLeague"]),
+    ...mapState(["currentLeague"]),
     isFull() {
       return this.currentLeague.teams.length >= this.currentLeague.max;
-    }
+    },
   },
   created() {
-    return this.getLeague(this.$route.params.uid).then(() => this.loaded = true);
+    return this.getLeague(this.$route.params.uid).then(
+      () => (this.loaded = true)
+    );
   },
 };
 </script>

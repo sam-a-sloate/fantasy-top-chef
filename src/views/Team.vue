@@ -3,8 +3,15 @@
     <div class="col1">
       <h1>Welcome to {{ this.$store.state.currentTeam.name }}</h1>
       <h2>
-        You are in the league: 
-        <router-link :to="{name: 'League', params: {uid: this.$store.state.currentLeague.id}}"> {{ this.$store.state.currentLeague.name }}</router-link>
+        You are in the league:
+        <router-link
+          :to="{
+            name: 'League',
+            params: { uid: this.$store.state.currentLeague.id },
+          }"
+        >
+          {{ this.$store.state.currentLeague.name }}</router-link
+        >
       </h2>
     </div>
   </div>
