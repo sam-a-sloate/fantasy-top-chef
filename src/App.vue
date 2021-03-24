@@ -3,29 +3,25 @@
     <div v-if="showNav">
       <v-navigation-drawer v-model="sidebar" app>
         <v-list>
-          <v-list-tile
+          <v-list-item
             v-for="item in menuItems"
             :key="item.title"
             :to="item.path"
           >
-            <v-list-tile-content>{{ item.title }}</v-list-tile-content>
-          </v-list-tile>
+            <v-list-item-content>{{ item.title }}</v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar app>
-        <span class="hidden-sm-and-up">
-          <v-toolbar-side-icon @click="sidebar = !sidebar">
-          </v-toolbar-side-icon>
-        </span>
+      <v-app-bar app>
         <v-toolbar-title>
-          <router-link to="/" tag="span" style="cursor: pointer">
+          <router-link to="/" style="cursor: pointer">
             {{ appTitle }}
           </router-link>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items class="hidden-xs-only">
           <v-btn
-            flat
+            text
             v-for="item in menuItems"
             :key="item.title"
             :to="item.path"
@@ -34,11 +30,11 @@
             {{ item.title }}
           </v-btn>
         </v-toolbar-items>
-      </v-toolbar>
+      </v-app-bar>
 
-      <v-content>
+      <v-main>
         <router-view></router-view>
-      </v-content>
+      </v-main>
     </div>
   </v-app>
 </template>

@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     userProfile: {},
     currentLeague: {},
     currentTeam: {},
+    ownedTeams: [],
     leagues: [],
   },
   mutations: {
@@ -24,6 +25,9 @@ const store = new Vuex.Store({
     },
     setCurrentTeam(state, val) {
       state.currentTeam = val;
+    },
+    setOwnedTeams(state, val) {
+      state.teams = val;
     },
   },
   getters: {
@@ -126,6 +130,21 @@ const store = new Vuex.Store({
           commit("setCurrentTeam", { id: uid, ...data });
           dispatch("setCurrentLeague", { uid: data.league });
         });
+    },
+
+    async setOwnedTeams({ commit }) {
+      const teams = await fb.teamCollection
+        .where("owner", "==", fb.auth.currentUser.uid)
+        .get();
+      if(teams.empty) {
+        commit("setOwnedTeams", [])
+      } else {
+        const teamData = teams.docs.map(function(team) {
+          return {id: team.id, ...team.data()};
+        });
+          
+        commit("setOwnedTeams", teamData)
+      }
     },
   },
   modules: {},

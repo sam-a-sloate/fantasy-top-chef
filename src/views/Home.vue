@@ -18,22 +18,66 @@
         >
       </v-col>
 
+      <v-container v-if="loaded">
         <v-col class="mb-5" cols="12">
-        <h2 class="headline font-weight-bold mb-3">My Teams</h2>
-
-        <v-row justify="center">
-          
-        </v-row>
-      </v-col>
+          <p v-if="noTeams" class="subheading font-weight-regular">
+            You have no Teams! Consider joining a league or creating your own
+          </p>
+          <v-simple-table v-else dark>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-center">Team</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="team in teams" :key="team.name">
+                  <td>
+                    <router-link
+                      :to="{
+                        name: 'Team',
+                        params: { uid: team.id },
+                      }"
+                    >
+                      {{ team.name }}
+                    </router-link>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+          <v-row justify="center"> </v-row>
+        </v-col>
+      </v-container>
     </v-row>
   </v-container>
 </template>
 
 <script>
 // @ is an alias to /src
+import { mapState } from "vuex";
+
 export default {
   name: "Home",
-  components: {},
-  
+  data() {
+    return {
+      loaded: false,
+    };
+  },
+  methods: {
+    async getOwnedTeams() {
+      await this.$store.dispatch("setOwnedTeams");
+    },
+  },
+  computed: {
+    ...mapState(["teams"]),
+    noTeams() {
+      console.log(this.teams);
+      return this.teams.length == 0;
+    },
+  },
+  created() {
+    this.getOwnedTeams().then(() => (this.loaded = true));
+  },
 };
 </script>
