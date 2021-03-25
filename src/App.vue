@@ -36,6 +36,11 @@
         <router-view></router-view>
       </v-main>
     </div>
+    <div v-else>
+      <v-main>
+        <router-view></router-view>
+      </v-main>
+    </div>
   </v-app>
 </template>
 <script>
@@ -49,7 +54,9 @@ export default {
       sidebar: false,
       menuItems: [
           { title: 'Home', path: '/home' },
-          { title: 'Login', path: '/login'}
+          { title: 'Cast', path: '/cast' },
+          { title: 'Login', path: '/login'},
+          { title: 'Logout', path: '/logout'}
      ]
   }),
   computed: {

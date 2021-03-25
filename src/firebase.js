@@ -23,6 +23,7 @@ const auth = firebase.auth();
 const usersCollection = db.collection("users");
 const leagueCollection = db.collection("leagueCollection");
 const teamCollection = db.collection("teamCollection");
+const topChefCollection = db.doc("shows/top-chef/season/18");
 
 // export utils/refs
-export { db, auth, usersCollection, leagueCollection, teamCollection };
+export { db, auth, usersCollection, leagueCollection, teamCollection, topChefCollection };

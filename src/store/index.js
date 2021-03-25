@@ -14,6 +14,7 @@ const store = new Vuex.Store({
     currentTeam: {},
     ownedTeams: [],
     leagues: [],
+    cast: {},
   },
   mutations: {
     // Any state mutations can be defined in this method
@@ -28,6 +29,9 @@ const store = new Vuex.Store({
     },
     setOwnedTeams(state, val) {
       state.teams = val;
+    },
+    setCast(state, val) {
+      state.cast = val;
     },
   },
   getters: {
@@ -136,14 +140,23 @@ const store = new Vuex.Store({
       const teams = await fb.teamCollection
         .where("owner", "==", fb.auth.currentUser.uid)
         .get();
-      if(teams.empty) {
-        commit("setOwnedTeams", [])
+      if (teams.empty) {
+        commit("setOwnedTeams", []);
       } else {
-        const teamData = teams.docs.map(function(team) {
-          return {id: team.id, ...team.data()};
+        const teamData = teams.docs.map(function (team) {
+          return { id: team.id, ...team.data() };
         });
-          
-        commit("setOwnedTeams", teamData)
+
+        commit("setOwnedTeams", teamData);
+      }
+    },
+
+    async setCast({ commit }) {
+      const cast = await fb.topChefCollection.get();
+      if (cast.empty) {
+        commit("setCast", []);
+      } else {
+        commit("setCast", cast.data());
       }
     },
   },
