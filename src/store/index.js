@@ -2,15 +2,16 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as fb from "../firebase";
 import router from "../router/index";
-import firebase from "firebase/app";
 
 Vue.use(Vuex);
 
+//How can I determine which team is there? Basically when someone enters the draft page I need to
 const store = new Vuex.Store({
   state: {
     // Fully describes signed in user's profile
     userProfile: {},
     currentLeague: {},
+    inDraft: false,
     currentTeam: {},
     ownedTeams: [],
     leagues: [],
@@ -32,6 +33,9 @@ const store = new Vuex.Store({
     },
     setCast(state, val) {
       state.cast = val;
+    },
+    setInDraft(state, val) {
+      state.inDraft = val;
     },
   },
   getters: {
@@ -93,6 +97,9 @@ const store = new Vuex.Store({
         owner: fb.auth.currentUser.uid,
         ownerName: state.userProfile.name,
         teams: [],
+        draft: {
+          teams: {},
+        },
       });
       router.push("/league/" + newLeague.id);
     },
@@ -110,10 +117,7 @@ const store = new Vuex.Store({
         league: state.currentLeague.id,
       });
       await fb.leagueCollection.doc(state.currentLeague.id).update({
-        teams: firebase.firestore.FieldValue.arrayUnion({
-          id: newTeam.id,
-          ...teamInLeague,
-        }),
+        [`teams.${newTeam.id}`]: teamInLeague,
       });
       router.push("/team/" + newTeam.id);
     },
@@ -158,6 +162,30 @@ const store = new Vuex.Store({
       } else {
         commit("setCast", cast.data());
       }
+    },
+
+    async enterDraft({ commit, dispatch, state }, { league, team }) {
+      dispatch("setCurrentLeague", { uid: league }).then(() => {
+        //If the team is in the league
+        if (state.currentLeague.teams[team]) {
+          //And the team is not already in the draft
+          //Add the team to the draft
+          fb.leagueCollection.doc(league).update({
+            [`draft.teams.${team}`]: {
+              isLive: true,
+              ...state.currentLeague.teams[team],
+            },
+          });
+          commit("setInDraft", true);
+        }
+      });
+    },
+
+    async exitDraft({ commit }, { league, team }) {
+      fb.leagueCollection.doc(league).update({
+        [`draft.teams.${team}.isLive`]: false,
+      });
+      commit("setInDraft", false);
     },
   },
   modules: {},

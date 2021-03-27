@@ -8,12 +8,12 @@
               v-for="(chef, id) in cast"
               :key="id"
               class="d-flex child-flex mb-1"
-              cols="2"
+              cols="auto"
             >
               <a :href="`https://www.bravotv.com/people/${id}`">
                 <v-img
                   :src="`https://www.bravotv.com/sites/bravo/files/styles/cast_head_shot_square_computer/public/2021/02/top-chef-season-18-headshot-${chef.id}.jpg`"
-                  :lazy-src="`https://www.bravotv.com/sites/bravo/files/styles/cast_head_shot_square_computer/public/2021/02/top-chef-season-18-headshot-${id}.jpg`"
+                  :lazy-src="`https://www.bravotv.com/sites/bravo/files/styles/cast_head_shot_square_computer/public/2021/02/top-chef-season-18-headshot-${chef.id}.jpg`"
                   aspect-ratio="1"
                   max-height="300"
                   max-width="250"

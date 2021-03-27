@@ -72,7 +72,6 @@ export default {
   computed: {
     ...mapState(["teams"]),
     noTeams() {
-      console.log(this.teams);
       return this.teams.length == 0;
     },
   },

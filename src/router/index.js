@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import { auth } from "../firebase";
-import store from "../store/index"
+import store from "../store/index";
 
 Vue.use(VueRouter);
 
@@ -71,6 +71,17 @@ const routes = [
 
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/Team.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    //Page Containing scoring and rules
+    path: "/league/:league/draft/:team",
+    name: "Draft",
+
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Draft.vue"),
     meta: {
       requiresAuth: true,
     },
