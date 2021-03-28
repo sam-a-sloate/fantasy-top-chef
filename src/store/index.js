@@ -5,12 +5,16 @@ import router from "../router/index";
 
 Vue.use(Vuex);
 
+//How can I determine which team is there? Basically when someone enters the draft page I need to
 const store = new Vuex.Store({
   state: {
     // Fully describes signed in user's profile
     userProfile: {},
     currentLeague: {},
+    currentTeam: {},
+    ownedTeams: [],
     leagues: [],
+    cast: {},
   },
   mutations: {
     // Any state mutations can be defined in this method
@@ -19,6 +23,15 @@ const store = new Vuex.Store({
     },
     setCurrentLeague(state, val) {
       state.currentLeague = val;
+    },
+    setCurrentTeam(state, val) {
+      state.currentTeam = val;
+    },
+    setOwnedTeams(state, val) {
+      state.teams = val;
+    },
+    setCast(state, val) {
+      state.cast = val;
     },
   },
   getters: {
@@ -80,15 +93,91 @@ const store = new Vuex.Store({
         owner: fb.auth.currentUser.uid,
         ownerName: state.userProfile.name,
         teams: [],
+        show: "top-chef",
       });
       router.push("/league/" + newLeague.id);
+    },
+
+    async createTeam({ state }, teamForm) {
+      const teamInLeague = {
+        name: teamForm.name,
+        ownerName: state.userProfile.name,
+        owner: fb.auth.currentUser.uid,
+        roster: [],
+      };
+      const newTeam = await fb.teamCollection.add({
+        name: teamForm.name,
+        owner: fb.auth.currentUser.uid,
+        ownerName: state.userProfile.name,
+        league: state.currentLeague.id,
+        roster: [], //Ids of all the chefs that are on the team
+      });
+      await fb.leagueCollection.doc(state.currentLeague.id).update({
+        [`teams.${newTeam.id}`]: teamInLeague,
+      });
+      router.push("/team/" + newTeam.id);
     },
 
     async setCurrentLeague({ commit }, { uid }) {
       return fb.leagueCollection
         .doc(uid)
         .get()
-        .then((cl) => commit("setCurrentLeague", cl.data()));
+        .then((cl) => commit("setCurrentLeague", { id: uid, ...cl.data() }));
+    },
+
+    async setCurrentTeam({ commit, dispatch }, { uid }) {
+      return fb.teamCollection
+        .doc(uid)
+        .get()
+        .then((cl) => {
+          const data = cl.data();
+          commit("setCurrentTeam", { id: uid, ...data });
+          dispatch("setCurrentLeague", { uid: data.league });
+        });
+    },
+
+    //TODO do we need a team collection
+    async setOwnedTeams({ commit }) {
+      const teams = await fb.teamCollection
+        .where("owner", "==", fb.auth.currentUser.uid)
+        .get();
+      if (teams.empty) {
+        commit("setOwnedTeams", []);
+      } else {
+        const teamData = teams.docs.map(function (team) {
+          return { id: team.id, ...team.data() };
+        });
+
+        commit("setOwnedTeams", teamData);
+      }
+    },
+
+    async setCast({ commit }) {
+      const cast = await fb.topChefCollection.get();
+      if (cast.empty) {
+        commit("setCast", []);
+      } else {
+        commit("setCast", cast.data());
+      }
+    },
+
+    async enterDraft({ dispatch, state }, { league, team }) {
+      dispatch("setCurrentLeague", { uid: league }).then(() => {
+        //If the team is in the league
+        if (state.currentLeague.teams[team]) {
+          // Mark the team as being in the draft
+          fb.leagueCollection.doc(league).update({
+            [`teams.${team}.inDraft`]: true,
+          });
+        }
+      });
+    },
+
+    async selectPlayer({ dispatch }, { id, league, team }) {
+      await fb.leagueCollection.doc(league).update({
+        [`teams.${team}.roster`]: fb.fieldValue.arrayUnion(id),
+      });
+      dispatch("setCurrentLeague", league);
     },
   },
   modules: {},

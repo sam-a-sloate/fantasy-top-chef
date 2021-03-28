@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import { auth } from "../firebase";
+import store from "../store/index";
 
 Vue.use(VueRouter);
 
@@ -20,6 +21,16 @@ const routes = [
     name: "Login",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/Login.vue"),
+  },
+  {
+    path: "/logout",
+    name: "Logout",
+    component: {
+      beforeRouteEnter(to, from, next) {
+        store.dispatch("logout");
+        next();
+      },
+    },
   },
   {
     //Page Containing scoring and rules
@@ -49,6 +60,39 @@ const routes = [
 
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/JoinLeague.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    //Page Containing scoring and rules
+    path: "/team/:uid",
+    name: "Team",
+
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Team.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    //Page Containing scoring and rules
+    path: "/league/:league/draft/:team",
+    name: "Draft",
+
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Draft.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    //Page Containing scoring and rules
+    path: "/cast",
+    name: "Cast",
+
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Cast.vue"),
     meta: {
       requiresAuth: true,
     },

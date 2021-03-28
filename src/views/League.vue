@@ -8,7 +8,7 @@
       </h2>
       <h2>
         To invite players send them this link
-        <a :href="fullPath"> {{this.fullPath}}</a>
+        <a :href="fullPath"> {{ this.fullPath }}</a>
       </h2>
     </div>
   </div>
@@ -25,7 +25,9 @@ export default {
   },
   computed: {
     fullPath: function () {
-      return window.location.origin + "/login#" + this.$route.fullPath + "/join";
+      return (
+        window.location.origin + "/login#" + this.$route.fullPath + "/join"
+      );
     },
   },
   created() {

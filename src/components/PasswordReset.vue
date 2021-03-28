@@ -6,7 +6,11 @@
       <div v-if="!showSuccess">
         <p>Enter your email to reset your password</p>
         <form @submit.prevent>
-          <input v-model.trim="email" type="email" placeholder="you@email.com" />
+          <input
+            v-model.trim="email"
+            type="email"
+            placeholder="you@email.com"
+          />
         </form>
         <p v-if="errorMsg !== ''" class="error">{{ errorMsg }}</p>
         <button @click="resetPassword()" class="button">Reset</button>
@@ -17,25 +21,25 @@
 </template>
 
 <script>
-import { auth } from '@/firebase'
+import { auth } from "@/firebase";
 export default {
   data() {
     return {
-      email: '',
+      email: "",
       showSuccess: false,
-      errorMsg: ''
-    }
+      errorMsg: "",
+    };
   },
   methods: {
     async resetPassword() {
-      this.errorMsg = ''
+      this.errorMsg = "";
       try {
-        await auth.sendPasswordResetEmail(this.email)
-        this.showSuccess = true
+        await auth.sendPasswordResetEmail(this.email);
+        this.showSuccess = true;
       } catch (err) {
-        this.errorMsg = err.message
+        this.errorMsg = err.message;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
