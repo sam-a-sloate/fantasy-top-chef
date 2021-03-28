@@ -11,7 +11,6 @@ const store = new Vuex.Store({
     // Fully describes signed in user's profile
     userProfile: {},
     currentLeague: {},
-    inDraft: false,
     currentTeam: {},
     ownedTeams: [],
     leagues: [],
@@ -33,9 +32,6 @@ const store = new Vuex.Store({
     },
     setCast(state, val) {
       state.cast = val;
-    },
-    setInDraft(state, val) {
-      state.inDraft = val;
     },
   },
   getters: {
@@ -97,9 +93,7 @@ const store = new Vuex.Store({
         owner: fb.auth.currentUser.uid,
         ownerName: state.userProfile.name,
         teams: [],
-        draft: {
-          teams: {},
-        },
+        show: "top-chef",
       });
       router.push("/league/" + newLeague.id);
     },
@@ -109,12 +103,14 @@ const store = new Vuex.Store({
         name: teamForm.name,
         ownerName: state.userProfile.name,
         owner: fb.auth.currentUser.uid,
+        roster: [],
       };
       const newTeam = await fb.teamCollection.add({
         name: teamForm.name,
         owner: fb.auth.currentUser.uid,
         ownerName: state.userProfile.name,
         league: state.currentLeague.id,
+        roster: [], //Ids of all the chefs that are on the team
       });
       await fb.leagueCollection.doc(state.currentLeague.id).update({
         [`teams.${newTeam.id}`]: teamInLeague,
@@ -140,6 +136,7 @@ const store = new Vuex.Store({
         });
     },
 
+    //TODO do we need a team collection
     async setOwnedTeams({ commit }) {
       const teams = await fb.teamCollection
         .where("owner", "==", fb.auth.currentUser.uid)
@@ -164,28 +161,23 @@ const store = new Vuex.Store({
       }
     },
 
-    async enterDraft({ commit, dispatch, state }, { league, team }) {
+    async enterDraft({ dispatch, state }, { league, team }) {
       dispatch("setCurrentLeague", { uid: league }).then(() => {
         //If the team is in the league
         if (state.currentLeague.teams[team]) {
-          //And the team is not already in the draft
-          //Add the team to the draft
+          // Mark the team as being in the draft
           fb.leagueCollection.doc(league).update({
-            [`draft.teams.${team}`]: {
-              isLive: true,
-              ...state.currentLeague.teams[team],
-            },
+            [`teams.${team}.inDraft`]: true,
           });
-          commit("setInDraft", true);
         }
       });
     },
 
-    async exitDraft({ commit }, { league, team }) {
-      fb.leagueCollection.doc(league).update({
-        [`draft.teams.${team}.isLive`]: false,
+    async selectPlayer({ dispatch }, { id, league, team }) {
+      await fb.leagueCollection.doc(league).update({
+        [`teams.${team}.roster`]: fb.fieldValue.arrayUnion(id),
       });
-      commit("setInDraft", false);
+      dispatch("setCurrentLeague", league);
     },
   },
   modules: {},

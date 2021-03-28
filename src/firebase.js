@@ -18,6 +18,7 @@ firebase.analytics();
 // utils
 const db = firebase.firestore();
 const auth = firebase.auth();
+const fieldValue = firebase.firestore.FieldValue;
 
 // collection references
 const usersCollection = db.collection("users");
@@ -26,4 +27,4 @@ const teamCollection = db.collection("teamCollection");
 const topChefCollection = db.doc("shows/top-chef/season/18");
 
 // export utils/refs
-export { db, auth, usersCollection, leagueCollection, teamCollection, topChefCollection };
+export { db, auth, usersCollection, leagueCollection, teamCollection, topChefCollection, fieldValue };
