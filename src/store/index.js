@@ -38,6 +38,9 @@ const store = new Vuex.Store({
     leagueIsFull: (state) => {
       return state.currentLeague.teams.length >= state.currentLeague;
     },
+    cast: (state) => {
+      return state.cast;
+    },
   },
   actions: {
     async login({ dispatch }, form) {
@@ -94,6 +97,7 @@ const store = new Vuex.Store({
         ownerName: state.userProfile.name,
         teams: [],
         show: "top-chef",
+        pick: ""
       });
       router.push("/league/" + newLeague.id);
     },
