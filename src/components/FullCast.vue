@@ -9,7 +9,7 @@
           cols="auto"
         >
           <!-- TODO Make the cast member a component and figure out why sometimes this does not load! -->
-          <a :href="`https://www.bravotv.com/people/${id}`" v-if="link">
+          <a :href="`https://www.bravotv.com/people/${id}`" v-if="link" v-bind:class="{ disabledImg: disabled[id] }">
             <CastPic :id="chef.id">
             </CastPic>
           </a>
@@ -25,7 +25,7 @@
             </div>
           </button>
 
-          <CastPic v-else :id="chef.id"/>
+          <CastPic v-else :id="chef.id" v-bind:class="{ disabledImg: disabled[id] }"/>
         </v-col>
       </v-row>
     </template>

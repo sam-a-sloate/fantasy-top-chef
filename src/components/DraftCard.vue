@@ -1,6 +1,6 @@
 <template>
   <v-card :loading="loading" class="mx-auto my-12" max-width="300">
-    <div v-bind:class="{ notPresent: !present }">
+    <div v-bind:class="{ notPresent: !present, selectedCard: turn }">
       <template slot="progress">
         <v-progress-linear
           color="deep-purple"
@@ -48,6 +48,9 @@ export default {
     present: {
       type: Boolean,
     },
+    turn: {
+      type: Boolean,
+    },
     team: {
       type: Object,
       default: () => {},
@@ -75,6 +78,6 @@ export default {
   -webkit-filter: grayscale(100%);
 }
 .selectedCard {
-    border-left: 5px solid red !important
+    border: 6px solid green !important
 }
 </style>
