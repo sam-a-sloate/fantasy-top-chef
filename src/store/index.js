@@ -98,6 +98,7 @@ const store = new Vuex.Store({
         teams: [],
         show: "top-chef",
         pick: 0,
+        draft: false
       });
       router.push("/league/" + newLeague.id);
     },
@@ -219,6 +220,7 @@ const store = new Vuex.Store({
       await fb.leagueCollection.doc(state.currentLeague.id).update({
         [`order`]: order,
         ["pick"]: 0,
+        ["draft"]: true
       });
       
     },
