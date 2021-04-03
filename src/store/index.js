@@ -31,7 +31,7 @@ const store = new Vuex.Store({
       state.teams = val;
     },
     setCast(state, val) {
-      state.cast = val;
+      state.cast = Object.assign({}, val);
     },
   },
   getters: {

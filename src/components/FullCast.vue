@@ -1,46 +1,37 @@
 <template>
-  <v-container>
-    <template>
-      <v-row>
-        <v-col
-          v-for="(chef, id) in cast"
-          :key="id"
-          class="d-flex child-flex"
-          cols="auto"
-        >
-          <!-- TODO Make the cast member a component and figure out why sometimes this does not load! -->
-          <a :href="`https://www.bravotv.com/people/${id}`" v-if="link" v-bind:class="{ disabledImg: disabled[id] }">
-            <CastPic :id="chef.id">
-            </CastPic>
-          </a>
+  <!-- Move to parent -->
+  <v-row>
+    <v-col
+      v-for="(chef, id) in this.cast"
+      :key="id"
+      class="d-flex child-flex"
+      cols="auto"
+    >
+      <!-- TODO Make the cast member a component and figure out why sometimes this does not load! -->
+      <a :href="`https://www.bravotv.com/people/${id}`" v-if="link">
+        <CastPic :id="chef.id" :class="{ disabledImg: chef.eliminated }">
+        </CastPic>
+      </a>
 
-          <button
-            v-else-if="clickable"
-            :disabled="disabled[id]"
-            v-on:click="$emit('choose-chef', id)"
-          >
-            <div v-bind:class="{ disabledImg: disabled[id] }">
-              <CastPic :id="chef.id">
-            </CastPic>
-            </div>
-          </button>
+      <button
+        v-else-if="clickable"
+        :disabled="disabled[id] || chef.eliminated"
+        v-on:click="$emit('choose-chef', id)"
+      >
+        <div :class="{ disabledImg: disabled[id] || chef.eliminated }">
+          <CastPic :id="chef.id"> </CastPic>
+        </div>
+      </button>
 
-          <CastPic v-else :id="chef.id" v-bind:class="{ disabledImg: disabled[id] }"/>
-        </v-col>
-      </v-row>
-    </template>
-  </v-container>
+      <CastPic v-else :id="chef.id" :class="{ disabledImg: chef.eliminated }" />
+    </v-col>
+  </v-row>
 </template>
 
 <script>
 import CastPic from "@/components/CastPic";
 export default {
-  name: "Home",
-  data() {
-    return {
-      loaded: false,
-    };
-  },
+  name: "FullCast",
   props: {
     link: {
       type: Boolean,
@@ -63,12 +54,12 @@ export default {
   },
   computed: {
     cast() {
-      return this.$store.getters.cast;
+      return Object.assign({}, this.$store.getters.cast);
     },
   },
   //TODO images not loaded when page is first opened for some reason! Figure this out later
   created() {
-    return this.getCast().then(() => this.loaded = true);
+    this.getCast();
   },
   components: {
     CastPic,

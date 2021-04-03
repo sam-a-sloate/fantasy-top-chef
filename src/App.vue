@@ -54,7 +54,6 @@ export default {
       sidebar: false,
       menuItems: [
           { title: 'Cast', path: '/cast' },
-          { title: 'Login', path: '/login'},
           { title: 'Logout', path: '/logout'}
      ]
   }),

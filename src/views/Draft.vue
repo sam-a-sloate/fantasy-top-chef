@@ -114,7 +114,7 @@ export default {
     //The person must own the team. This can be done in the router to check if they own the team!! Otherwise bad for sure
     this.enterDraft(this.$route.params.league, this.$route.params.team);
     fb.leagueCollection.doc(this.$route.params.league).onSnapshot((snap) => {
-      this.dleague = snap.data();
+      this.dleague = snap.data(); //TODO sort these by key to keep consistent order
     })
   },
   components: {
