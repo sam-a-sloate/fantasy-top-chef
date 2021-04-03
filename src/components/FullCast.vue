@@ -15,10 +15,10 @@
 
       <button
         v-else-if="clickable"
-        :disabled="disabled[id] || chef.eliminated"
+        :disabled="disabled[id]"
         v-on:click="$emit('choose-chef', id)"
       >
-        <div :class="{ disabledImg: disabled[id] || chef.eliminated }">
+        <div :class="{ disabledImg: disabled[id]}">
           <CastPic :id="chef.id"> </CastPic>
         </div>
       </button>
