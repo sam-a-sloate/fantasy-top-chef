@@ -26,7 +26,7 @@ export default {
   computed: {
     fullPath: function () {
       return (
-        window.location.origin + "/fantasy-top-chef/login#" + this.$route.fullPath + "/join"
+        window.location.origin + "/fantasy-top-chef/#/" + this.$route.fullPath + "/join"
       );
     },
   },
