@@ -31,12 +31,15 @@ const store = new Vuex.Store({
       state.teams = val;
     },
     setCast(state, val) {
-      state.cast = val;
+      state.cast = Object.assign({}, val);
     },
   },
   getters: {
     leagueIsFull: (state) => {
       return state.currentLeague.teams.length >= state.currentLeague;
+    },
+    cast: (state) => {
+      return state.cast;
     },
   },
   actions: {
@@ -94,6 +97,7 @@ const store = new Vuex.Store({
         ownerName: state.userProfile.name,
         teams: [],
         show: "top-chef",
+        pick: 0,
       });
       router.push("/league/" + newLeague.id);
     },
@@ -176,8 +180,47 @@ const store = new Vuex.Store({
     async selectPlayer({ dispatch }, { id, league, team }) {
       await fb.leagueCollection.doc(league).update({
         [`teams.${team}.roster`]: fb.fieldValue.arrayUnion(id),
+        ["pick"]: fb.fieldValue.increment(1),
       });
-      dispatch("setCurrentLeague", league);
+      console.log(dispatch);
+    },
+
+    //TODO: Need to do this before the page is entered or this will not work damn
+    async initializeDraft({ state }) {
+      // Generates list of team ids in advance based on the cast size
+
+      //1) Generate list of ids in advance based on the cast size and number of players? Seems easy
+      let index = 0;
+      let forwards = true;
+      const teams = Object.keys(state.currentLeague.teams); // Get the teams
+      const length = teams.length; // Get the length of the key set
+      let order = [];
+      Object.keys(state.cast).forEach(function () {
+        //For each chef ID (x number of times)
+        //Get the team at the index
+        order.push(teams[index]); //Add the team to the overall list
+        if (forwards) {
+          if (index == length - 1) {
+            //Time to Snake back
+            forwards = false;
+          } else {
+            //Move forward
+            index = index + 1;
+          }
+        } else {
+          if (index == 0) {
+            //Time to snake forward
+            forwards = true;
+          } else {
+            index = index - 1;
+          }
+        }
+      });
+      await fb.leagueCollection.doc(state.currentLeague.id).update({
+        [`order`]: order,
+        ["pick"]: 0,
+      });
+      
     },
   },
   modules: {},

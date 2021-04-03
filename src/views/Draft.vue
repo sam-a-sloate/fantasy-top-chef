@@ -1,14 +1,35 @@
 <template>
   <v-container fluid>
     <v-row dense>
-      <v-col cols="2" v-for="(team, id) in teams" :key="id">
-        <DraftCard color="accent" :teamName="team.name">
+      <v-col cols="2" v-for="(team, id) in dleague.teams" :key="id">
+        <!-- TODO keep consistent ordering here for a better UX bc this changes -->
+        <DraftCard
+          color="accent"
+          :teamName="team.name"
+          :present="team.inDraft"
+          :team="team"
+          :turn="id === currentPick"
+        >
           {{ team.name }}
         </DraftCard>
       </v-col>
+      <v-col cols="2">
+        <button
+          @click="startDraft()"
+          :disabled="!allTeamsPresent"
+          class="button"
+        >
+          Begin Draft
+        </button>
+      </v-col>
     </v-row>
     <v-divider></v-divider>
-    <FullCast :clickable="true" :disabled="chosen" v-on:choose-chef="selectPlayer"> </FullCast>
+    <FullCast
+      :clickable="currentPick === this.$route.params.team"
+      :disabled="chosen"
+      v-on:choose-chef="selectPlayer"
+    >
+    </FullCast>
   </v-container>
 </template>
 
@@ -20,7 +41,9 @@ import FullCast from "@/components/FullCast";
 export default {
   data() {
     return {
-      teams: {},
+      dleague: {
+        teams: {}
+      },
     };
   },
   methods: {
@@ -41,14 +64,42 @@ export default {
         team: this.$route.params.team,
       });
     },
+    startDraft() {
+      //Kick off the draft setting the pick order
+      this.$store.dispatch("initializeDraft");
+    },
   },
   computed: {
-    chosen: function() {
-      return Object.values(this.teams).reduce((collector, reducee) => collector.concat(reducee.roster), []).reduce((obj, chef) => {
-        obj[chef]=true;
-        return obj;
-      }, {})
-    }
+    chosen: function () {
+      if(!this.dleague) {
+        return {};
+      }
+      return Object.values(this.dleague.teams)
+        .reduce((collector, reducee) => collector.concat(reducee.roster), [])
+        .reduce((obj, chef) => {
+          obj[chef] = true;
+          return obj;
+        }, {});
+    },
+    allTeamsPresent: function () {
+      if (this.dleague.teams) {
+        return (
+          Object.keys(this.dleague.teams).length ==
+          Object.keys(this.dleague.teams).filter(
+            (k) => this.dleague.teams[k].inDraft
+          ).length
+        );
+      } else {
+        return false;
+      }
+    },
+    currentPick: function () {
+      //Get the current team picking
+      if (!this.dleague.order) {
+        return false;
+      }
+      return this.dleague.order[this.dleague.pick];
+    },
   },
   watch: {
     $route() {
@@ -63,13 +114,8 @@ export default {
     //The person must own the team. This can be done in the router to check if they own the team!! Otherwise bad for sure
     this.enterDraft(this.$route.params.league, this.$route.params.team);
     fb.leagueCollection.doc(this.$route.params.league).onSnapshot((snap) => {
-      this.teams = Object.fromEntries(
-        Object.entries(snap.data().teams).filter(([key, value]) => {
-          console.log(key);
-          return value.inDraft === true;
-        })
-      );
-    });
+      this.dleague = snap.data(); //TODO sort these by key to keep consistent order
+    })
   },
   components: {
     DraftCard,
