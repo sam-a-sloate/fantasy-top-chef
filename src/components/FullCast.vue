@@ -23,7 +23,7 @@
         </div>
       </button>
 
-      <CastPic v-else :id="chef.id" :class="{ disabledImg: chef.eliminated }" />
+      <CastPic v-else :id="chef.id" :class="{ disabledImg: disabled[id] }" />
     </v-col>
   </v-row>
 </template>
