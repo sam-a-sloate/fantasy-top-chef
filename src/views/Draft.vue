@@ -16,7 +16,7 @@
       <v-col cols="2">
         <button
           @click="startDraft()"
-          :disabled="!allTeamsPresent && !dleague.draft"
+          :disabled="!allTeamsPresent || dleague.draft"
           class="button"
         >
         <!-- Fix this all teams present issue -->
